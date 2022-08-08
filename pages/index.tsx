@@ -4,10 +4,9 @@ import { useRouter } from "next/router"
 import { FormEvent } from "react"
 import { useState } from "react"
 
+import { updateId as updateChannelId } from "../store/channelSlice"
 import { useAppDispatch } from "../store/hooks"
-import { updateId, updateUsername } from "../store/userSlice"
-
-// import { incrementByAmount } from "../store/userSlice"
+import { updateId as updateUserId, updateUsername } from "../store/userSlice"
 
 type TErrors = {
   username?: string
@@ -57,10 +56,7 @@ const Home: NextPage = () => {
       })
 
       if (res?.status === 201) {
-        const data = await res.json()
-
-        dispatch(updateId(data.id))
-        dispatch(updateUsername(username))
+        const data = (await res.json()).content
 
         const channelRes = await fetch("/api/channel/connect", {
           method: "POST",
@@ -76,9 +72,13 @@ const Home: NextPage = () => {
         })
 
         if (channelRes?.status === 201) {
+          dispatch(updateUserId(data.id))
+          dispatch(updateUsername(username))
+          dispatch(updateChannelId(channelId))
+
           router.push(`/channel/${channelId}`)
         } else {
-          tempErr.misc = res?.statusText
+          tempErr.misc = channelRes?.statusText
         }
       } else {
         tempErr.misc = res?.statusText
