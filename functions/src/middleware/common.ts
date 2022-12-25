@@ -30,6 +30,9 @@ export async function userRequired(
       description: "User has not been created",
     })
   } else {
+    await admin.firestore().collection("users").doc(userId).update({
+      lastActive: Date.now(),
+    })
     return next()
   }
 }
