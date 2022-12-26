@@ -1,12 +1,7 @@
-type TConnectedUser = {
-  [selectUserId: string]: {
-    id: string
-    username: string
-  }
-}
+import type { TChannelConnectedUsers } from "~~types/channel"
 
 type TChannelUserListProps = {
-  connectedUser: TConnectedUser
+  connectedUser: TChannelConnectedUsers
   selectUserId: string
 }
 

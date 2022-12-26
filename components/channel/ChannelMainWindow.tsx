@@ -1,33 +1,16 @@
 import { useRouter } from "next/router"
 import Pusher, { Channel } from "pusher-js"
 import { useEffect, useState } from "react"
+import type {
+  TChannelConnectedUsers,
+  TChannelInteraction,
+  TChannelMessage,
+} from "~~types/channel"
 
 import { useAppSelector } from "@store/hooks"
 
 import ChannelPostSection from "./ChannelPostsSection"
 import ChannelUserList from "./ChannelUserList"
-
-type TMessage = {
-  type: string
-  sender: string
-  username: string
-  message: string
-  timestamp: number
-}
-
-type TInteraction = {
-  type: "CONNECT" | "DISCONNECT"
-  id: string
-  username: string
-  timestamp: number
-}
-
-type TConnectedUser = {
-  [key: string]: {
-    id: string
-    username: string
-  }
-}
 
 const ChannelMainWindow = () => {
   const router = useRouter()
@@ -36,8 +19,10 @@ const ChannelMainWindow = () => {
   const selectUsername = useAppSelector((state) => state.user.username)
   const selectChannelId = useAppSelector((state) => state.channel.id)
 
-  const [posts, setPosts] = useState<Array<TMessage | TInteraction>>([])
-  const [connectedUser, setConnectedUser] = useState<TConnectedUser>({
+  const [posts, setPosts] = useState<
+    Array<TChannelMessage | TChannelInteraction>
+  >([])
+  const [connectedUser, setConnectedUser] = useState<TChannelConnectedUsers>({
     [selectUserId]: {
       id: selectUserId,
       username: selectUsername,
@@ -69,20 +54,20 @@ const ChannelMainWindow = () => {
       })
 
     const channel = pusherClient.subscribe(`channel.${selectChannelId}`)
-    channel.bind("message", (data: TMessage) => {
+    channel.bind("message", (data: TChannelMessage) => {
       setPosts((prev) => [...prev, data])
     })
-    channel.bind("connect/disconnect", (data: TInteraction) => {
+    channel.bind("connect/disconnect", (data: TChannelInteraction) => {
       setPosts((prev) => [...prev, data])
 
       const updatedConnectedUsers = { ...connectedUser }
       if (data.type === "CONNECT") {
-        updatedConnectedUsers[data.id] = {
-          id: data.id,
+        updatedConnectedUsers[data.userId] = {
+          id: data.userId,
           username: data.username,
         }
       } else {
-        delete updatedConnectedUsers[data.id]
+        delete updatedConnectedUsers[data.userId]
       }
       setConnectedUser(updatedConnectedUsers)
     })
@@ -133,7 +118,6 @@ const ChannelMainWindow = () => {
           posts={posts}
           selectChannelId={selectChannelId}
           selectUserId={selectUserId}
-          selectUsername={selectUsername}
         />
       </div>
     </div>

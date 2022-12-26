@@ -19,8 +19,9 @@
       "@components/*": ["components/*"],
       "@lib/*": ["lib/*"],
       "@styles/*": ["styles/*"],
-      "@store/*": ["store/*"]
-    }
+      "@store/*": ["store/*"],
+      "~~types/*": ["types/*"]
+    },
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

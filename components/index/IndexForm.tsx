@@ -1,6 +1,7 @@
 import { useRouter } from "next/router"
 import { FormEvent } from "react"
 import { useState } from "react"
+import { TIndexFormErrors } from "~~types/index"
 
 import { updateId as updateChannelId } from "@store/channelSlice"
 import { useAppDispatch } from "@store/hooks"
@@ -8,24 +9,18 @@ import { updateId as updateUserId, updateUsername } from "@store/userSlice"
 
 import IndexInput from "./IndexInput"
 
-type TErrors = {
-  username?: string
-  channelId?: string
-  misc?: string
-}
-
 const IndexForm = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
 
   const [username, setUsername] = useState("")
   const [channelId, setChannelId] = useState("")
-  const [errors, setErrors] = useState<TErrors>()
+  const [errors, setErrors] = useState<TIndexFormErrors>()
 
   async function validateForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    const tempErr: TErrors = {}
+    const tempErr: TIndexFormErrors = {}
 
     if (!username) {
       tempErr.username = "Username is required"

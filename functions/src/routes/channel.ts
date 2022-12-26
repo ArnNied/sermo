@@ -120,7 +120,7 @@ async function connectToChannel(req: Request, res: Response) {
 
       pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "CONNECT",
-        id: userId,
+        userId: userId,
         username: user.data()!.username,
         timestamp: Date.now(),
       })
@@ -150,6 +150,7 @@ async function connectToChannel(req: Request, res: Response) {
 
     pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
       type: "CONNECT",
+      userId: userId,
       username: user.data()!.username,
       timestamp: Date.now(),
     })
@@ -191,7 +192,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
 
       pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "DISCONNECT",
-        id: userId,
+        userId: userId,
         username: user.data()!.username,
         timestamp: Date.now(),
       })
