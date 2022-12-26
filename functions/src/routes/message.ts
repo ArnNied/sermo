@@ -27,7 +27,13 @@ async function sendMessage(req: Request, res: Response) {
         lastActive: Date.now(),
       })
 
-      pusher.trigger(`channel.${channelId}`, "message", req.body)
+      pusher.trigger(`channel.${channelId}`, "message", {
+        type: "MESSAGE",
+        sender: userId,
+        message: message,
+        timestamp: Date.now(),
+      })
+
       return res.status(201).json({
         status: "CREATED",
         description: "Message successfully sent",

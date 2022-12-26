@@ -2,7 +2,7 @@
 import { Request, Response } from "express"
 import express from "express"
 
-import { admin } from "../core"
+import { admin, pusher } from "../core"
 import { channelValidateBody, deleteEmptyChannels } from "../middleware/channel"
 import { userRequired } from "../middleware/common"
 import { getBearerToken } from "../utils"
@@ -34,11 +34,13 @@ async function connectToChannel(req: Request, res: Response) {
   const userId = getBearerToken(req.headers.authorization)
   const channelId = req.body.channelId
 
-  let channel = await admin
+  const channel = await admin
     .firestore()
     .collection("channels")
     .doc(channelId)
     .get()
+
+  const user = await admin.firestore().collection("users").doc(userId).get()
 
   if (channel.exists) {
     if (channel.data()!.connectedUsers.includes(userId)) {
@@ -54,6 +56,12 @@ async function connectToChannel(req: Request, res: Response) {
         .update({
           connectedUsers: [...channel.data()!.connectedUsers, userId],
         })
+
+      pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
+        type: "CONNECT",
+        username: user.data()!.username,
+        timestamp: Date.now(),
+      })
 
       return res.status(200).json({
         status: "OK",
@@ -77,6 +85,12 @@ async function connectToChannel(req: Request, res: Response) {
         connectedUsers: [userId],
       })
 
+    pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
+      type: "CONNECT",
+      username: user.data()!.username,
+      timestamp: Date.now(),
+    })
+
     return res.status(201).json({
       status: "CREATED",
       description: "Channel successfully created",
@@ -96,6 +110,8 @@ async function disconnectFromChannel(req: Request, res: Response) {
     .doc(channelId)
     .get()
 
+  const user = await admin.firestore().collection("users").doc(userId).get()
+
   if (channel.exists) {
     if (channel.data()!.connectedUsers.includes(userId)) {
       await admin
@@ -107,6 +123,14 @@ async function disconnectFromChannel(req: Request, res: Response) {
             .data()!
             .connectedUsers.filter((user: string) => user !== userId),
         })
+
+      await admin.firestore().collection("users").doc(userId).delete()
+
+      pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
+        type: "DISCONNECT",
+        username: user.data()!.username,
+        timestamp: Date.now(),
+      })
 
       return res.status(200).json({
         status: "OK",
