@@ -1,7 +1,7 @@
 import type { NextPage } from "next"
 
-import ChannelHeader from "@components/channel/header"
-import ChannelMainWindow from "@components/channel/main-window"
+import ChannelHeader from "@components/channel/ChannelHeader"
+import ChannelMainWindow from "@components/channel/ChannelMainWindow"
 
 const ChannelPage: NextPage = () => {
   return (

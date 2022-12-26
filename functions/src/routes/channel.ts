@@ -28,6 +28,67 @@ async function getAllChannel(req: Request, res: Response) {
   })
 }
 
+async function getChannel(req: Request, res: Response) {
+  const channelId = req.params.channelId
+
+  const channel = await admin
+    .firestore()
+    .collection("channels")
+    .doc(channelId)
+    .get()
+
+  if (channel.exists) {
+    return res.status(200).json({
+      status: "OK",
+      description: "Channel retrieved",
+      content: channel.data(),
+    })
+  } else {
+    return res.status(404).json({
+      status: "ERROR",
+      description: "Channel does not exist",
+    })
+  }
+}
+
+async function getChannelUsers(req: Request, res: Response) {
+  const channelId = req.params.channelId
+
+  const channel = await admin
+    .firestore()
+    .collection("channels")
+    .doc(channelId)
+    .get()
+
+  if (channel.exists) {
+    const listOfUsersId = channel.data()!.connectedUsers
+    const listOfUsers = []
+
+    for (const userId of listOfUsersId) {
+      const user = await admin.firestore().collection("users").doc(userId).get()
+
+      listOfUsers.push({
+        id: user.id,
+        username: user.data()!.username,
+        lastActive: user.data()!.lastActive,
+      })
+    }
+
+    console.log(listOfUsers)
+
+    return res.status(200).json({
+      status: "OK",
+      description: "List of users in channel",
+      content: listOfUsers,
+    })
+  } else {
+    return res.status(404).json({
+      status: "ERROR",
+      description: "Channel does not exist",
+    })
+  }
+}
+
 // Create a new channel if it doesn't exist
 // If it exists, connect the user to the channel
 async function connectToChannel(req: Request, res: Response) {
@@ -59,6 +120,7 @@ async function connectToChannel(req: Request, res: Response) {
 
       pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "CONNECT",
+        id: userId,
         username: user.data()!.username,
         timestamp: Date.now(),
       })
@@ -66,6 +128,7 @@ async function connectToChannel(req: Request, res: Response) {
       return res.status(200).json({
         status: "OK",
         description: "User successfully connected to channel",
+        content: channel.data(),
       })
     }
   } else {
@@ -104,7 +167,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
   const channelId = req.body.channelId
   const userId = getBearerToken(req.headers.authorization)
 
-  let channel = await admin
+  const channel = await admin
     .firestore()
     .collection("channels")
     .doc(channelId)
@@ -128,6 +191,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
 
       pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "DISCONNECT",
+        id: userId,
         username: user.data()!.username,
         timestamp: Date.now(),
       })
@@ -137,9 +201,16 @@ async function disconnectFromChannel(req: Request, res: Response) {
         description: "User successfully disconnected from channel",
       })
     } else {
+      const channel = await admin
+        .firestore()
+        .collection("channels")
+        .doc(channelId)
+        .get()
+
       return res.status(200).json({
         status: "OK",
         description: "User already disconnected from channel or not connected",
+        content: channel.data(),
       })
     }
   } else {
@@ -151,6 +222,8 @@ async function disconnectFromChannel(req: Request, res: Response) {
 }
 
 router.get("/", getAllChannel)
+router.get("/:channelId", getChannel)
+router.get("/:channelId/users", getChannelUsers)
 router.use(userRequired, channelValidateBody, deleteEmptyChannels)
 router.post("/connect", connectToChannel)
 router.post("/disconnect", disconnectFromChannel)

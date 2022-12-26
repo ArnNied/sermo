@@ -1,11 +1,12 @@
+import { useRouter } from "next/router"
+import { FormEvent } from "react"
+import { useState } from "react"
+
 import { updateId as updateChannelId } from "@store/channelSlice"
 import { useAppDispatch } from "@store/hooks"
 import { updateId as updateUserId, updateUsername } from "@store/userSlice"
 
-import { useRouter } from "next/router"
-import { FormEvent } from "react"
-import { useState } from "react"
-import IndexInput from "./input"
+import IndexInput from "./IndexInput"
 
 type TErrors = {
   username?: string
@@ -13,7 +14,7 @@ type TErrors = {
   misc?: string
 }
 
-const ConnectForm = () => {
+const IndexForm = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
 
@@ -130,4 +131,4 @@ const ConnectForm = () => {
   )
 }
 
-export default ConnectForm
+export default IndexForm

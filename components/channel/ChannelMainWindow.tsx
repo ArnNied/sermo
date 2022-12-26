@@ -1,47 +1,53 @@
 import { useRouter } from "next/router"
 import Pusher, { Channel } from "pusher-js"
-import { FormEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { useAppSelector } from "@store/hooks"
 
-import ChannelMessageForm from "./message-form"
-import ChannelMessageWindow from "./message-window"
-import ChannelUserList from "./user-list"
+import ChannelPostSection from "./ChannelPostsSection"
+import ChannelUserList from "./ChannelUserList"
 
 type TMessage = {
   type: string
   sender: string
+  username: string
   message: string
   timestamp: number
 }
 
-type TConnectDisconnect = {
-  type: string
+type TInteraction = {
+  type: "CONNECT" | "DISCONNECT"
+  id: string
   username: string
   timestamp: number
 }
 
+type TConnectedUser = {
+  [key: string]: {
+    id: string
+    username: string
+  }
+}
+
 const ChannelMainWindow = () => {
   const router = useRouter()
+
   const selectUserId = useAppSelector((state) => state.user.id)
   const selectUsername = useAppSelector((state) => state.user.username)
   const selectChannelId = useAppSelector((state) => state.channel.id)
 
-  const [messages, setMessages] = useState<
-    Array<TMessage | TConnectDisconnect>
-  >([])
-
-  const [connectedUser, setConnectedUser] = useState({
+  const [posts, setPosts] = useState<Array<TMessage | TInteraction>>([])
+  const [connectedUser, setConnectedUser] = useState<TConnectedUser>({
     [selectUserId]: {
       id: selectUserId,
       username: selectUsername,
     },
   })
 
-  const pusherClient = new Pusher("222a5569391c6d1461b9", {
-    cluster: "ap1",
+  const pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
   })
-  let pusherChannel: Channel
+  const [pusherChannel, setPusherChannel] = useState<Channel>()
 
   useEffect(() => {
     if (!selectUsername) {
@@ -49,21 +55,43 @@ const ChannelMainWindow = () => {
       return
     }
 
-    pusherChannel = pusherClient.subscribe(`channel.${selectChannelId}`)
-    pusherChannel.bind("message", (data: TMessage) => {
-      setMessages((prev) => [...prev, data])
-      alert(JSON.stringify(data))
+    fetch(`/api/channel/${selectChannelId}/users`)
+      .then((res) => res.json())
+      .then((data) => {
+        const updatedConnectedUsers = { ...connectedUser }
+        data.content.forEach((user: { id: string; username: string }) => {
+          updatedConnectedUsers[user.id] = {
+            id: user.id,
+            username: user.username,
+          }
+        })
+        setConnectedUser(updatedConnectedUsers)
+      })
+
+    const channel = pusherClient.subscribe(`channel.${selectChannelId}`)
+    channel.bind("message", (data: TMessage) => {
+      setPosts((prev) => [...prev, data])
     })
-    pusherChannel.bind("connect/disconnect", (data: TConnectDisconnect) => {
-      setMessages((prev) => [...prev, data])
-      alert(JSON.stringify(data))
+    channel.bind("connect/disconnect", (data: TInteraction) => {
+      setPosts((prev) => [...prev, data])
+
+      const updatedConnectedUsers = { ...connectedUser }
+      if (data.type === "CONNECT") {
+        updatedConnectedUsers[data.id] = {
+          id: data.id,
+          username: data.username,
+        }
+      } else {
+        delete updatedConnectedUsers[data.id]
+      }
+      setConnectedUser(updatedConnectedUsers)
     })
 
-    console.log("connected")
+    setPusherChannel(channel)
 
     return () => {
-      pusherChannel.unbind_all()
-      pusherChannel.unsubscribe()
+      channel.unbind_all()
+      channel.unsubscribe()
     }
   }, [])
 
@@ -76,8 +104,6 @@ const ChannelMainWindow = () => {
       },
       body: JSON.stringify({ channelId: selectChannelId }),
     })
-
-    const req = (await res.json()).content
 
     if (res.status === 200) {
       pusherClient.unsubscribe(`channel.${selectChannelId}`)
@@ -103,8 +129,8 @@ const ChannelMainWindow = () => {
           connectedUser={connectedUser}
           selectUserId={selectUserId}
         />
-        <ChannelMessageWindow
-          messages={messages}
+        <ChannelPostSection
+          posts={posts}
           selectChannelId={selectChannelId}
           selectUserId={selectUserId}
           selectUsername={selectUsername}

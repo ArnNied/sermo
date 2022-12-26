@@ -1,13 +1,13 @@
 import type { NextPage } from "next"
 
-import ConnectForm from "@components/index/connect-form"
-import IndexPhoto from "@components/index/photo"
+import IndexForm from "@components/index/IndexForm"
+import IndexPhoto from "@components/index/IndexPhoto"
 
 const Home: NextPage = () => {
   return (
     <div className="flex flex-row">
       <IndexPhoto />
-      <ConnectForm />
+      <IndexForm />
     </div>
   )
 }
