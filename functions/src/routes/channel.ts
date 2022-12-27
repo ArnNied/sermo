@@ -74,8 +74,6 @@ async function getChannelUsers(req: Request, res: Response) {
       })
     }
 
-    console.log(listOfUsers)
-
     return res.status(200).json({
       status: "OK",
       description: "List of users in channel",

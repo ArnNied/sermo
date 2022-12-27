@@ -1,20 +1,25 @@
 import { FormEvent, useState } from "react"
+import TextareaAutosize from "react-textarea-autosize"
 
-type TChanelMessageFormProps = {
-  selectChannelId: string
-  selectUserId: string
-}
+import { useAppSelector } from "@store/hooks"
 
-const ChannelMessageForm = ({
-  selectChannelId,
-  selectUserId,
-}: TChanelMessageFormProps) => {
+const ChannelMessageForm = () => {
+  const selectUserId = useAppSelector((state) => state.user.id)
+  const selectChannelId = useAppSelector((state) => state.channel.id)
+
   const [textMessage, setTextMessage] = useState("")
+  const [canSend, setCanSend] = useState(true)
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    const res = fetch("/api/message/", {
+    if (!canSend) return
+
+    setCanSend(false)
+
+    setTextMessage("")
+
+    fetch("/api/message/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,20 +30,22 @@ const ChannelMessageForm = ({
         message: textMessage,
       }),
     })
+
+    setTimeout(() => {
+      setCanSend(true)
+    }, 150)
   }
 
   return (
     <div className="w-full flex p-2 bg-green-800">
       <form onSubmit={handleSubmit} className="w-full flex flex-row">
-        {/* <input
-                  type="text"
-                  className="w-full px-2 py-1 border border-solid border-green-600 rounded-tl-lg rounded-bl-lg"
-                /> */}
-        <textarea
+        <TextareaAutosize
+          minRows={1}
+          maxRows={3}
+          value={textMessage}
           onChange={(e) => setTextMessage(e.target.value)}
-          rows={1}
           className="w-full px-2 py-1 border border-solid border-green-600 rounded-tl-lg rounded-bl-lg"
-        ></textarea>
+        />
         <button
           type="submit"
           className="px-2 py-1 bg-green-600 hover:bg-green-700 active:bg-green-800 border border-solid border-green-600 text-white rounded-tr-lg rounded-br-lg"

@@ -110,15 +110,8 @@ const ChannelMainWindow = () => {
         </button>
       </div>
       <div className="w-full h-full flex flex-row divide-x divide-green-600">
-        <ChannelUserList
-          connectedUser={connectedUser}
-          selectUserId={selectUserId}
-        />
-        <ChannelPostSection
-          posts={posts}
-          selectChannelId={selectChannelId}
-          selectUserId={selectUserId}
-        />
+        <ChannelUserList connectedUser={connectedUser} />
+        <ChannelPostSection posts={posts} />
       </div>
     </div>
   )

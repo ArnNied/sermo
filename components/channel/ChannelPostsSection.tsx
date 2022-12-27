@@ -1,20 +1,18 @@
 import type { TChannelInteraction, TChannelMessage } from "~~types/channel"
 
+import { useAppSelector } from "@store/hooks"
+
 import ChannelMessageForm from "./ChannelMessageForm"
 import ChannelPostInteraction from "./ChannelPostInteraction"
 import ChannelPostMessage from "./ChannelPostMessage"
 
 type TChannelPostSectionProps = {
   posts: Array<TChannelMessage | TChannelInteraction>
-  selectChannelId: string
-  selectUserId: string
 }
 
-const ChannelPostSection = ({
-  posts,
-  selectChannelId,
-  selectUserId,
-}: TChannelPostSectionProps) => {
+const ChannelPostSection = ({ posts }: TChannelPostSectionProps) => {
+  const selectUserId = useAppSelector((state) => state.user.id)
+
   return (
     <div className="w-9/12 flex flex-col">
       <div className="h-full flex flex-col py-2 space-y-1">
@@ -42,10 +40,7 @@ const ChannelPostSection = ({
           }
         })}
       </div>
-      <ChannelMessageForm
-        selectChannelId={selectChannelId}
-        selectUserId={selectUserId}
-      />
+      <ChannelMessageForm />
     </div>
   )
 }
