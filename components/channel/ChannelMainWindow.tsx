@@ -7,6 +7,7 @@ import type {
   TChannelMessage,
 } from "~~types/channel"
 
+import { PUSHER } from "@core/pusher"
 import { useAppSelector } from "@store/hooks"
 
 import ChannelPostSection from "./ChannelPostsSection"
@@ -29,9 +30,6 @@ const ChannelMainWindow = () => {
     },
   })
 
-  const pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-  })
   const [pusherChannel, setPusherChannel] = useState<Channel>()
 
   useEffect(() => {
@@ -53,7 +51,7 @@ const ChannelMainWindow = () => {
         setConnectedUser(updatedConnectedUsers)
       })
 
-    const channel = pusherClient.subscribe(`channel.${selectChannelId}`)
+    const channel = PUSHER.subscribe(`channel.${selectChannelId}`)
     channel.bind("message", (data: TChannelMessage) => {
       setPosts((prev) => [...prev, data])
     })
@@ -91,7 +89,11 @@ const ChannelMainWindow = () => {
     })
 
     if (res.status === 200) {
-      pusherClient.unsubscribe(`channel.${selectChannelId}`)
+      pusherChannel!.unbind_all()
+      pusherChannel!.unsubscribe()
+      pusherChannel!.disconnect()
+      setPusherChannel(undefined)
+
       router.push("/")
     }
   }

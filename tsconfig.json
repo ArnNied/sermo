@@ -20,6 +20,7 @@
       "@lib/*": ["lib/*"],
       "@styles/*": ["styles/*"],
       "@store/*": ["store/*"],
+      "@core/*": ["core/*"],
       "~~types/*": ["types/*"]
     },
   },
