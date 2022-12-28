@@ -37,18 +37,18 @@ const ChannelMessageForm = () => {
   }
 
   return (
-    <div className="w-full flex p-2 bg-green-800">
+    <div className="w-full flex py-4">
       <form onSubmit={handleSubmit} className="w-full flex flex-row">
         <TextareaAutosize
           minRows={1}
           maxRows={3}
           value={textMessage}
           onChange={(e) => setTextMessage(e.target.value)}
-          className="w-full px-2 py-1 border border-solid border-green-600 rounded-tl-lg rounded-bl-lg"
+          className="w-full px-2 py-1 rounded-tl-lg rounded-bl-lg focus:outline-none"
         />
         <button
           type="submit"
-          className="px-2 py-1 bg-green-600 hover:bg-green-700 active:bg-green-800 border border-solid border-green-600 text-white rounded-tr-lg rounded-br-lg"
+          className="px-2 py-1 bg-quaternary-base hover:bg-quaternary-base active:bg-quaternary-base text-white rounded-tr-lg rounded-br-lg"
         >
           Send
         </button>

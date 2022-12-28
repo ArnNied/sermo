@@ -14,8 +14,8 @@ const ChannelPostSection = ({ posts }: TChannelPostSectionProps) => {
   const selectUserId = useAppSelector((state) => state.user.id)
 
   return (
-    <div className="w-9/12 flex flex-col">
-      <div className="h-full flex flex-col py-2 space-y-1">
+    <div className="w-9/12 flex flex-col px-8">
+      <div className="h-full flex flex-col py-2 space-y-1 overflow-y-auto">
         {posts.map((post, index) => {
           if (post.type === "MESSAGE") {
             const message = post as TChannelMessage

@@ -10,10 +10,10 @@ const Message = ({ message, username, timestamp, self }: TMessageProps) => {
     <div
       className={`px-2 flex flex-col ${self ? "items-end" : "justify-start"}`}
     >
-      <p className="text-sm text-gray-500">{self ? "Me" : username}</p>
+      <p className="text-sm text-white">{self ? "Me" : username}</p>
       <div
-        className={`flex flex-col px-2 py-1 rounded w-fit max-w-md ${
-          self ? "bg-green-600 text-white" : "bg-gray-200"
+        className={`w-fit max-w-md flex flex-col px-2 py-1 text-white rounded ${
+          self ? "bg-primary-darker" : "bg-quaternary-base"
         }`}
       >
         <p className="whitespace-pre-line">{message}</p>

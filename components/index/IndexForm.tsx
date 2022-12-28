@@ -84,7 +84,7 @@ const IndexForm = () => {
   }
 
   return (
-    <div className="w-5/12 h-screen flex flex-col justify-center p-2 md:p-4 lg:p-8 xl:p-16 bg-green-600 space-y-4">
+    <div className="w-5/12 h-screen flex flex-col justify-center p-2 md:p-4 lg:p-8 xl:p-16 bg-primary-base space-y-4">
       <div className="flex flex-col">
         <h1 className="font-bold text-6xl text-white text-center">SERMO</h1>
         <h2 className="font-semibold text-white text-center">
@@ -112,7 +112,7 @@ const IndexForm = () => {
           <div className="flex flex-col space-y-1">
             <button
               type="submit"
-              className="p-1 bg-green-600 hover:bg-green-700 active:bg-green-800 text-lg text-white rounded"
+              className="p-1 bg-primary-base hover:bg-primary-dark active:bg-primary-darker text-lg text-white rounded"
             >
               Join/Create Channel
             </button>

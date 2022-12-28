@@ -16,7 +16,7 @@ export default function Document() {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <body className="bg-green-600">
+      <body className="bg-tertiary-base">
         <Main />
         <NextScript />
       </body>

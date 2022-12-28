@@ -21,7 +21,7 @@ const IndexInput = ({
         type="text"
         placeholder={display}
         onChange={(e) => onChangeHandler(e.target.value)}
-        className="px-1 py-px border-b-2 border-solid border-green-600 border-opacity-50 focus:border-opacity-100 outline-none"
+        className="px-1 py-px border-b-2 border-solid border-primary-base border-opacity-50 focus:border-opacity-100 outline-none"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
