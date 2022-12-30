@@ -50,10 +50,21 @@ const ChannelPage: NextPage = () => {
       })
 
     const channel = PUSHER.subscribe(`channel.${selectChannelId}`)
-    channel.bind("message", (data: TChannelMessage) => {
+    setPusherChannel(channel)
+
+    return () => {
+      setPusherChannel(undefined)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!pusherChannel) return
+
+    pusherChannel.bind("message", (data: TChannelMessage) => {
       setPosts((prev) => [...prev, data])
+      console.log(selectChannelId)
     })
-    channel.bind("connect/disconnect", (data: TChannelInteraction) => {
+    pusherChannel.bind("connect/disconnect", (data: TChannelInteraction) => {
       setPosts((prev) => [...prev, data])
 
       const updatedConnectedUsers = { ...connectedUser }
@@ -68,15 +79,11 @@ const ChannelPage: NextPage = () => {
       setConnectedUser(updatedConnectedUsers)
     })
 
-    console.log("channel")
-    setPusherChannel(channel)
-
     return () => {
-      channel.unbind_all()
-      channel.unsubscribe()
-      console.log("channel unbind")
+      pusherChannel.unbind_all()
+      pusherChannel.unsubscribe()
     }
-  }, [])
+  }, [pusherChannel])
 
   return (
     <div className="h-screen flex flex-col">
