@@ -44,11 +44,11 @@ const ChannelMessageForm = () => {
           maxRows={3}
           value={textMessage}
           onChange={(e) => setTextMessage(e.target.value)}
-          className="w-full px-2 py-1 rounded-tl-lg rounded-bl-lg focus:outline-none"
+          className="w-full px-2 py-1 rounded-tl rounded-bl focus:outline-none"
         />
         <button
           type="submit"
-          className="px-2 py-1 bg-quaternary-base hover:bg-quaternary-base active:bg-quaternary-base text-white rounded-tr-lg rounded-br-lg"
+          className="px-2 py-1 bg-quaternary-base hover:bg-quaternary-base active:bg-quaternary-base text-white rounded-tr rounded-br"
         >
           Send
         </button>

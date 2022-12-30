@@ -23,9 +23,10 @@ const ChannelPostSection = ({ posts }: TChannelPostSectionProps) => {
               <ChannelPostMessage
                 key={index}
                 message={message.message}
+                userId={message.userId}
                 username={message.username}
                 timestamp={message.timestamp}
-                self={message.sender == selectUserId}
+                self={message.userId === selectUserId}
               />
             )
           } else if (post.type === "CONNECT" || post.type === "DISCONNECT") {

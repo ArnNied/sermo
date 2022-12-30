@@ -1,3 +1,5 @@
+import parse from "html-react-parser"
+import * as Jidenticon from "jdenticon"
 import type { TChannelConnectedUsers } from "~~types/channel"
 
 import { useAppSelector } from "@store/hooks"
@@ -15,8 +17,11 @@ const ChannelUserList = ({ connectedUser }: TChannelUserListProps) => {
         Connected Users:{" "}
       </h4>
       {Object.values(connectedUser).map((user, index) => (
-        <div key={index} className="p-3 text-white">
-          {user.username} {user.id === selectUserId && "(Me)"}
+        <div key={index} className="flex flex-row items-center p-3 space-x-4">
+          {parse(Jidenticon.toSvg(user.id, 42, { backColor: "#FFF" }))}
+          <p className="text-white">
+            {user.username} {user.id === selectUserId && "(Me)"}
+          </p>
         </div>
       ))}
     </div>

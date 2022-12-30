@@ -91,7 +91,7 @@ const IndexForm = () => {
           Lightweight and No BS Messaging
         </h2>
       </div>
-      <div className="flex mx-8 p-4 bg-white rounded-xl">
+      <div className="flex mx-8 p-4 bg-white rounded-lg">
         <form
           method="POST"
           onSubmit={(e) => validateForm(e)}

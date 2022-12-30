@@ -31,7 +31,7 @@ async function sendMessage(req: Request, res: Response) {
 
       pusher.trigger(`channel.${channelId}`, "message", {
         type: "MESSAGE",
-        sender: userId,
+        userId: userId,
         username: user.data()!.username,
         message: message,
         timestamp: Date.now(),

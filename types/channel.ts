@@ -1,6 +1,6 @@
 export type TChannelMessage = {
   type: "MESSAGE"
-  sender: string
+  userId: string
   username: string
   message: string
   timestamp: number
