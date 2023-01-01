@@ -67,16 +67,21 @@ const ChannelPage: NextPage = () => {
     pusherChannel.bind("connect/disconnect", (data: TChannelInteraction) => {
       setPosts((prev) => [...prev, data])
 
-      const updatedConnectedUsers = { ...connectedUser }
       if (data.type === "CONNECT") {
-        updatedConnectedUsers[data.userId] = {
-          id: data.userId,
-          username: data.username,
-        }
+        setConnectedUser((prev) => ({
+          ...prev,
+          [data.userId]: {
+            id: data.userId,
+            username: data.username,
+          },
+        }))
       } else {
-        delete updatedConnectedUsers[data.userId]
+        setConnectedUser((prev) => {
+          const updatedConnectedUsers = { ...prev }
+          delete updatedConnectedUsers[data.userId]
+          return updatedConnectedUsers
+        })
       }
-      setConnectedUser(updatedConnectedUsers)
     })
 
     return () => {
