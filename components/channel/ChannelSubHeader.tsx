@@ -35,7 +35,7 @@ const ChannelSubHeader = ({ pusherChannel }: TChannelSubHeader) => {
   return (
     <div className="w-screen flex flex-row justify-between px-24 py-1 bg-secondary-base">
       <div className="flex flex-row items-center">
-        <Link href="https://github.com/ArnNied/inotes" className="text-white">
+        <Link href="https://github.com/ArnNied/sermo" className="text-white">
           About
         </Link>
       </div>

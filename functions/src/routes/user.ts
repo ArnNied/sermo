@@ -41,6 +41,19 @@ async function createNewUser(req: Request, res: Response) {
     })
   }
 
+  const userExist = await admin
+    .firestore()
+    .collection("users")
+    .where("username", "==", username)
+    .get()
+
+  if (!userExist.empty) {
+    return res.status(400).json({
+      status: "ERROR",
+      description: "Username already taken",
+    })
+  }
+
   let generatedId = `user-${nanoid(16)}`
 
   while (

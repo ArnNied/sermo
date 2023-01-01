@@ -11,7 +11,7 @@ type TChannelPostSectionProps = {
 }
 
 const ChannelPostSection = ({ posts }: TChannelPostSectionProps) => {
-  const selectUserId = useAppSelector((state) => state.user.id)
+  const selectUsername = useAppSelector((state) => state.user.username)
 
   return (
     <div className="w-9/12 flex flex-col px-8">
@@ -23,10 +23,9 @@ const ChannelPostSection = ({ posts }: TChannelPostSectionProps) => {
               <ChannelPostMessage
                 key={index}
                 message={message.message}
-                userId={message.userId}
                 username={message.username}
                 timestamp={message.timestamp}
-                self={message.userId === selectUserId}
+                self={message.username === selectUsername}
               />
             )
           } else if (post.type === "CONNECT" || post.type === "DISCONNECT") {

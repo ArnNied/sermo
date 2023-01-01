@@ -24,14 +24,9 @@ async function sendMessage(req: Request, res: Response) {
   if (channel.exists) {
     const user = await admin.firestore().collection("users").doc(userId).get()
 
-    if (channel.data()!.connectedUsers.includes(userId)) {
-      await admin.firestore().collection("users").doc(userId).update({
-        lastActive: Date.now(),
-      })
-
+    if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
       pusher.trigger(`channel.${channelId}`, "message", {
         type: "MESSAGE",
-        userId: userId,
         username: user.data()!.username,
         message: message,
         timestamp: Date.now(),

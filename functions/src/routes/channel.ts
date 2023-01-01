@@ -61,23 +61,10 @@ async function getChannelUsers(req: Request, res: Response) {
     .get()
 
   if (channel.exists) {
-    const listOfUsersId = channel.data()!.connectedUsers
-    const listOfUsers = []
-
-    for (const userId of listOfUsersId) {
-      const user = await admin.firestore().collection("users").doc(userId).get()
-
-      listOfUsers.push({
-        id: user.id,
-        username: user.data()!.username,
-        lastActive: user.data()!.lastActive,
-      })
-    }
-
     return res.status(200).json({
       status: "OK",
       description: "List of users in channel",
-      content: listOfUsers,
+      content: channel.data()!.connectedUsers,
     })
   } else {
     return res.status(404).json({
@@ -102,7 +89,7 @@ async function connectToChannel(req: Request, res: Response) {
   const user = await admin.firestore().collection("users").doc(userId).get()
 
   if (channel.exists) {
-    if (channel.data()!.connectedUsers.includes(userId)) {
+    if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
       return res.status(200).json({
         status: "OK",
         description: "User already connected to channel",
@@ -113,12 +100,14 @@ async function connectToChannel(req: Request, res: Response) {
         .collection("channels")
         .doc(channelId)
         .update({
-          connectedUsers: [...channel.data()!.connectedUsers, userId],
+          connectedUsers: [
+            ...channel.data()!.connectedUsers,
+            user.data()!.username,
+          ],
         })
 
       pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "CONNECT",
-        userId: userId,
         username: user.data()!.username,
         timestamp: Date.now(),
       })
@@ -131,11 +120,10 @@ async function connectToChannel(req: Request, res: Response) {
     }
   } else {
     const now = Date.now()
-
     const newChannel = {
       id: channelId,
       createdAt: now,
-      connectedUsers: [userId],
+      connectedUsers: [user.data()!.username],
     }
     await admin
       .firestore()
@@ -143,12 +131,11 @@ async function connectToChannel(req: Request, res: Response) {
       .doc(channelId)
       .set({
         createdAt: now,
-        connectedUsers: [userId],
+        connectedUsers: [user.data()!.username],
       })
 
     pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
       type: "CONNECT",
-      userId: userId,
       username: user.data()!.username,
       timestamp: Date.now(),
     })
@@ -175,7 +162,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
   const user = await admin.firestore().collection("users").doc(userId).get()
 
   if (channel.exists) {
-    if (channel.data()!.connectedUsers.includes(userId)) {
+    if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
       await admin
         .firestore()
         .collection("channels")
@@ -183,14 +170,15 @@ async function disconnectFromChannel(req: Request, res: Response) {
         .update({
           connectedUsers: channel
             .data()!
-            .connectedUsers.filter((user: string) => user !== userId),
+            .connectedUsers.filter(
+              (connectedUser: string) => connectedUser !== user.data()!.username
+            ),
         })
 
       await admin.firestore().collection("users").doc(userId).delete()
 
       pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "DISCONNECT",
-        userId: userId,
         username: user.data()!.username,
         timestamp: Date.now(),
       })

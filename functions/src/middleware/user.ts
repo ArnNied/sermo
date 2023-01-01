@@ -15,7 +15,9 @@ export async function deleteStaleUser(
     .where("lastActive", "<", Date.now() - USER_MAX_AGE_IN_MS)
     .get()
 
-  const usersToBeDeletedArray = usersToBeDeleted.docs.map((doc) => doc.id)
+  const usersToBeDeletedArray = usersToBeDeleted.docs.map(
+    (doc) => doc.data().username
+  )
 
   const channelsContainingUsersToBeDeleted = await admin
     .firestore()
@@ -33,13 +35,12 @@ export async function deleteStaleUser(
     batch.delete(doc.ref)
   })
 
-  channelsContainingUsersToBeDeleted.docs.forEach((doc) => {
-    batch.update(doc.ref, {
-      connectedUsers: doc
+  channelsContainingUsersToBeDeleted.docs.forEach((channel) => {
+    batch.update(channel.ref, {
+      connectedUsers: channel
         .data()
         .connectedUsers.filter(
-          (userId: string) =>
-            !usersToBeDeleted.docs.map((doc) => doc.id).includes(userId)
+          (user: string) => !usersToBeDeletedArray.includes(user)
         ),
     })
   })

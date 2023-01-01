@@ -15,19 +15,15 @@ import { PUSHER } from "@core/pusher"
 import { useAppSelector } from "@store/hooks"
 
 const ChannelPage: NextPage = () => {
-  const selectUserId = useAppSelector((state) => state.user.id)
   const selectUsername = useAppSelector((state) => state.user.username)
   const selectChannelId = useAppSelector((state) => state.channel.id)
 
   const [posts, setPosts] = useState<
     Array<TChannelMessage | TChannelInteraction>
   >([])
-  const [connectedUser, setConnectedUser] = useState<TChannelConnectedUsers>({
-    [selectUserId]: {
-      id: selectUserId,
-      username: selectUsername,
-    },
-  })
+  const [connectedUser, setConnectedUser] = useState<TChannelConnectedUsers>([
+    selectUsername,
+  ])
   const [pusherChannel, setPusherChannel] = useState<Channel>()
 
   useEffect(() => {
@@ -39,14 +35,10 @@ const ChannelPage: NextPage = () => {
     fetch(`/api/channel/${selectChannelId}/users`)
       .then((res) => res.json())
       .then((data) => {
-        const updatedConnectedUsers = { ...connectedUser }
-        data.content.forEach((user: { id: string; username: string }) => {
-          updatedConnectedUsers[user.id] = {
-            id: user.id,
-            username: user.username,
-          }
-        })
-        setConnectedUser(updatedConnectedUsers)
+        data = data.content.filter(
+          (username: string) => username !== selectUsername
+        )
+        setConnectedUser([selectUsername, ...data])
       })
 
     const channel = PUSHER.subscribe(`channel.${selectChannelId}`)
@@ -68,19 +60,11 @@ const ChannelPage: NextPage = () => {
       setPosts((prev) => [...prev, data])
 
       if (data.type === "CONNECT") {
-        setConnectedUser((prev) => ({
-          ...prev,
-          [data.userId]: {
-            id: data.userId,
-            username: data.username,
-          },
-        }))
+        setConnectedUser((prev) => [...prev, data.username])
       } else {
-        setConnectedUser((prev) => {
-          const updatedConnectedUsers = { ...prev }
-          delete updatedConnectedUsers[data.userId]
-          return updatedConnectedUsers
-        })
+        setConnectedUser((prev) =>
+          prev.filter((username) => username !== data.username)
+        )
       }
     })
 

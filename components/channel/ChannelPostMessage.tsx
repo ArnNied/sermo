@@ -3,19 +3,12 @@ import * as Jidenticon from "jdenticon"
 
 type TMessageProps = {
   message: string
-  userId: string
   username: string
   timestamp: number
   self: boolean
 }
 
-const Message = ({
-  message,
-  userId,
-  username,
-  timestamp,
-  self,
-}: TMessageProps) => {
+const Message = ({ message, username, timestamp, self }: TMessageProps) => {
   return (
     <div
       className={`px-2 flex space-x-2 ${
@@ -25,7 +18,7 @@ const Message = ({
       }`}
     >
       <div className="h-full flex items-start pt-1">
-        {parse(Jidenticon.toSvg(userId, 24, { backColor: "#FFF" }))}
+        {parse(Jidenticon.toSvg(username, 24, { backColor: "#FFF" }))}
       </div>
       <div className="flex flex-col">
         <p className={`text-sm text-white ${self ? "text-end" : "text-start"}`}>

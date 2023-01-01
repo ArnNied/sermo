@@ -1,6 +1,5 @@
 export type TChannelMessage = {
   type: "MESSAGE"
-  userId: string
   username: string
   message: string
   timestamp: number
@@ -8,7 +7,6 @@ export type TChannelMessage = {
 
 export type TChannelInteraction = {
   type: "CONNECT" | "DISCONNECT"
-  userId: string
   username: string
   timestamp: number
 }
@@ -19,9 +17,4 @@ export type TChannel = {
   connectedUsers: string[]
 }
 
-export type TChannelConnectedUsers = {
-  [userId: string]: {
-    id: string
-    username: string
-  }
-}
+export type TChannelConnectedUsers = Array<string>
