@@ -42,13 +42,22 @@ const ChannelSubHeader = ({
 
   return (
     <div className="w-screen flex flex-row justify-between items-center px-8 md:px-24 py-1 bg-secondary-base">
-      <button onClick={setShowUsers} className="block lg:hidden text-white">
+      <button
+        onClick={setShowUsers}
+        className="block lg:hidden text-white hover:text-gray-200 active:text-gray-400"
+      >
         {showUsers ? "Hide" : "Show"} Users
       </button>
-      <Link href="https://github.com/ArnNied/sermo" className="text-white">
+      <Link
+        href="https://github.com/ArnNied/sermo"
+        className="text-white hover:text-gray-200 active:text-gray-400"
+      >
         About
       </Link>
-      <button onClick={onDisconnectButtonClick} className="text-white">
+      <button
+        onClick={onDisconnectButtonClick}
+        className="text-white hover:text-gray-200 active:text-gray-400"
+      >
         Disconnect
       </button>
     </div>

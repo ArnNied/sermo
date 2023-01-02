@@ -1,26 +1,28 @@
 import Image from "next/image"
+import Link from "next/link"
+import { useEffect } from "react"
+
+import { SVGInjector } from "@tanem/svg-injector"
 
 const IndexPhoto = () => {
+  useEffect(() => {
+    SVGInjector(document.getElementById("index-photo"))
+  }, [])
+
   return (
-    <div className="relative w-7/12 h-screen">
-      <div className="relative w-full h-screen">
-        <Image src="/index/index.jpg" fill sizes="100vw" alt="Splash Image" />
-      </div>
-      <div className="absolute bottom-0 left-0 text-white">
-        Photo by{" "}
-        <a
-          href="https://unsplash.com/@ninjason?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
-          className="text-blue-600 hover:text-blue-700"
+    <div className="relative w-full md:w-7/12 h-[45%] md:h-screen">
+      <div
+        id="index-photo"
+        className="w-full h-full"
+        data-src="/index/chat-rafiki.svg"
+      ></div>
+      <div className="absolute inset-x-0 bottom-0 flex justify-center">
+        <Link
+          href="https://storyset.com/illustration/group-chat/rafiki#03DD33FF&hide=&hide=complete"
+          className="text-white underline"
         >
-          Jason Leung
-        </a>{" "}
-        on{" "}
-        <a
-          href="https://unsplash.com/s/photos/chat?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
-          className="text-blue-600 hover:text-blue-700"
-        >
-          Unsplash
-        </a>
+          Credit
+        </Link>
       </div>
     </div>
   )
