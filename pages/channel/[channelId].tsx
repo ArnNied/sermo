@@ -54,7 +54,6 @@ const ChannelPage: NextPage = () => {
 
     pusherChannel.bind("message", (data: TChannelMessage) => {
       setPosts((prev) => [...prev, data])
-      console.log(selectChannelId)
     })
     pusherChannel.bind("connect/disconnect", (data: TChannelInteraction) => {
       setPosts((prev) => [...prev, data])

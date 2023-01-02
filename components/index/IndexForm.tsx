@@ -40,44 +40,33 @@ const IndexForm = () => {
     }
 
     if (Object.keys(tempErr).length === 0) {
-      const res = await fetch("/api/user/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username }),
-      }).catch(() => {
-        tempErr.misc = "Something went wrong"
-      })
+      // const req = (await res.json()).content
+      let req, res
 
-      if (res?.status === 201) {
-        const req = (await res.json()).content
-
-        const channelRes = await fetch("/api/channel/connect", {
+      try {
+        req = await fetch("/api/channel/connect", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + req.id,
           },
           body: JSON.stringify({
-            userId: req.id,
+            username: username,
             channelId: channelId,
           }),
-        }).catch(() => {
-          tempErr.misc = "Something went wrong"
         })
+        res = await req?.json()
+      } catch (err) {
+        tempErr.misc = "Failed to connect to server"
+      }
 
-        if (channelRes?.status === 200 || channelRes?.status === 201) {
-          dispatch(updateUserId(req.id))
-          dispatch(updateUsername(username))
-          dispatch(updateChannelId(channelId))
+      if (req?.status === 200 || req?.status === 201) {
+        dispatch(updateUserId(res.content.user.id))
+        dispatch(updateUsername(username))
+        dispatch(updateChannelId(channelId))
 
-          router.push(`/channel/${channelId}`)
-        } else {
-          tempErr.misc = channelRes?.statusText
-        }
+        router.push(`/channel/${channelId}`)
       } else {
-        tempErr.misc = res?.statusText
+        tempErr.misc = req?.statusText
       }
     }
     setErrors(tempErr)

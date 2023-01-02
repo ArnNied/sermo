@@ -1,6 +1,7 @@
 // import cors from "cors"
 import { Request, Response } from "express"
 import express from "express"
+import { nanoid } from "nanoid"
 
 import { admin, pusher } from "../core"
 import { channelValidateBody, deleteEmptyChannels } from "../middleware/channel"
@@ -77,8 +78,20 @@ async function getChannelUsers(req: Request, res: Response) {
 // Create a new channel if it doesn't exist
 // If it exists, connect the user to the channel
 async function connectToChannel(req: Request, res: Response) {
-  const userId = getBearerToken(req.headers.authorization)
   const channelId = req.body.channelId
+  const username = req.body.username
+
+  if (!username) {
+    return res.status(400).json({
+      status: "ERROR",
+      description: '"username" field is required',
+    })
+  } else if (typeof username !== "string") {
+    return res.status(400).json({
+      status: "ERROR",
+      description: '"username" field must be string',
+    })
+  }
 
   const channel = await admin
     .firestore()
@@ -86,44 +99,64 @@ async function connectToChannel(req: Request, res: Response) {
     .doc(channelId)
     .get()
 
-  const user = await admin.firestore().collection("users").doc(userId).get()
+  if (channel.exists && channel.data()!.connectedUsers.includes(username)) {
+    return res.status(400).json({
+      status: "ERROR",
+      description: "Username already taken",
+    })
+  }
+
+  let generatedId = `user-${nanoid(16)}`
+  while (
+    (await admin.firestore().collection("users").doc(generatedId).get()).exists
+  ) {
+    generatedId = `user-${nanoid(16)}`
+  }
+
+  const now = Date.now()
+
+  const newUser = {
+    id: generatedId,
+    username: username,
+    createdAt: now,
+    lastActive: now,
+  }
+
+  await admin.firestore().collection("users").doc(generatedId).set({
+    username: username,
+    createdAt: now,
+    lastActive: now,
+  })
 
   if (channel.exists) {
-    if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
-      return res.status(200).json({
-        status: "OK",
-        description: "User already connected to channel",
-      })
-    } else {
-      await admin
-        .firestore()
-        .collection("channels")
-        .doc(channelId)
-        .update({
-          connectedUsers: [
-            ...channel.data()!.connectedUsers,
-            user.data()!.username,
-          ],
-        })
-
-      pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
-        type: "CONNECT",
-        username: user.data()!.username,
-        timestamp: Date.now(),
+    await admin
+      .firestore()
+      .collection("channels")
+      .doc(channelId)
+      .update({
+        connectedUsers: [...channel.data()!.connectedUsers, username],
       })
 
-      return res.status(200).json({
-        status: "OK",
-        description: "User successfully connected to channel",
-        content: channel.data(),
-      })
-    }
+    pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
+      type: "CONNECT",
+      username: username,
+      timestamp: Date.now(),
+    })
+
+    return res.status(200).json({
+      status: "OK",
+      description: "User successfully connected to channel",
+      content: {
+        channel: { id: channelId, ...channel.data() },
+        user: newUser,
+      },
+    })
   } else {
     const now = Date.now()
     const newChannel = {
       id: channelId,
       createdAt: now,
-      connectedUsers: [user.data()!.username],
+      connectedUsers: [username],
     }
     await admin
       .firestore()
@@ -131,19 +164,22 @@ async function connectToChannel(req: Request, res: Response) {
       .doc(channelId)
       .set({
         createdAt: now,
-        connectedUsers: [user.data()!.username],
+        connectedUsers: [username],
       })
 
     pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
       type: "CONNECT",
-      username: user.data()!.username,
+      username: username,
       timestamp: Date.now(),
     })
 
     return res.status(201).json({
       status: "CREATED",
       description: "Channel successfully created",
-      content: newChannel,
+      content: {
+        channel: newChannel,
+        user: newUser,
+      },
     })
   }
 }
@@ -211,8 +247,9 @@ async function disconnectFromChannel(req: Request, res: Response) {
 router.get("/", getAllChannel)
 router.get("/:channelId", getChannel)
 router.get("/:channelId/users", getChannelUsers)
-router.use(userRequired, channelValidateBody, deleteEmptyChannels)
+router.use(channelValidateBody, deleteEmptyChannels)
 router.post("/connect", connectToChannel)
+router.use(userRequired)
 router.post("/disconnect", disconnectFromChannel)
 
 export default router
