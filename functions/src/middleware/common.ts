@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express"
+import moment from "moment"
 
 import { admin } from "../core"
 import { getBearerToken } from "../utils"
@@ -31,7 +32,7 @@ export async function userRequired(
     })
   } else {
     await admin.firestore().collection("users").doc(userId).update({
-      lastActive: Date.now(),
+      lastActive: moment().valueOf(),
     })
     return next()
   }

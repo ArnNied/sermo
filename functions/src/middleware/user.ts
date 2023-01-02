@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express"
+import moment from "moment"
 
 import { USER_MAX_AGE_IN_MS } from "../config"
 import { admin } from "../core"
@@ -12,7 +13,7 @@ export async function deleteStaleUser(
   const usersToBeDeleted = await admin
     .firestore()
     .collection("users")
-    .where("lastActive", "<", Date.now() - USER_MAX_AGE_IN_MS)
+    .where("lastActive", "<", moment().valueOf() - USER_MAX_AGE_IN_MS)
     .get()
 
   const usersToBeDeletedArray = usersToBeDeleted.docs.map(

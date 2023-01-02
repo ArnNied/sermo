@@ -1,5 +1,7 @@
 import parse from "html-react-parser"
 import * as Jidenticon from "jdenticon"
+import moment from "moment"
+import { useEffect, useState } from "react"
 
 type TMessageProps = {
   message: string
@@ -9,6 +11,21 @@ type TMessageProps = {
 }
 
 const Message = ({ message, username, timestamp, self }: TMessageProps) => {
+  const [humanizedTimestamp, setHumanizedTimestamp] = useState<string>(
+    moment(timestamp).fromNow()
+  )
+
+  useEffect(() => {
+    // Update the timestamp every second
+    const interval = setInterval(() => {
+      setHumanizedTimestamp(moment(timestamp).fromNow())
+    }, 1000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
   return (
     <div
       className={`px-2 flex space-x-2 ${
@@ -29,7 +46,8 @@ const Message = ({ message, username, timestamp, self }: TMessageProps) => {
             self ? "bg-primary-darker" : "bg-quaternary-base"
           }`}
         >
-          <p className="whitespace-pre-line">{message}</p>
+          <p className="whitespace-pre-line break-words">{message}</p>
+          <p className="text-xs text-gray-200 text-end">{humanizedTimestamp}</p>
         </div>
       </div>
     </div>

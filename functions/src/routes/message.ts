@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import express from "express"
+import moment from "moment"
 
 import { admin } from "../core"
 import { pusher } from "../core"
@@ -23,6 +24,7 @@ async function sendMessage(req: Request, res: Response) {
 
   if (channel.exists) {
     const user = await admin.firestore().collection("users").doc(userId).get()
+    const now = moment().valueOf()
 
     // Check if user is connected to channel
     if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
@@ -30,13 +32,13 @@ async function sendMessage(req: Request, res: Response) {
         type: "MESSAGE",
         username: user.data()!.username,
         message: message,
-        timestamp: Date.now(),
+        timestamp: now,
       })
 
       return res.status(201).json({
         status: "CREATED",
         description: "Message successfully sent",
-        content: message,
+        content: { ...message, timestamp: now },
       })
     } else {
       return res.status(401).json({

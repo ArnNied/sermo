@@ -1,6 +1,7 @@
 // import cors from "cors"
 import { Request, Response } from "express"
 import express from "express"
+import moment from "moment"
 import { nanoid } from "nanoid"
 
 import { admin, pusher } from "../core"
@@ -118,7 +119,7 @@ async function connectToChannel(req: Request, res: Response) {
     generatedId = `user-${nanoid(16)}`
   }
 
-  const now = Date.now()
+  const now = moment().valueOf()
   const newUser = {
     id: generatedId,
     username: username,
@@ -147,7 +148,7 @@ async function connectToChannel(req: Request, res: Response) {
     pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
       type: "CONNECT",
       username: username,
-      timestamp: Date.now(),
+      timestamp: moment().valueOf(),
     })
 
     return res.status(200).json({
@@ -160,7 +161,7 @@ async function connectToChannel(req: Request, res: Response) {
     })
   } else {
     // If channel doesn't exist, create a new channel and connect the user to it
-    const now = Date.now()
+    const now = moment().valueOf()
     const newChannel = {
       id: channelId,
       createdAt: now,
@@ -179,7 +180,7 @@ async function connectToChannel(req: Request, res: Response) {
     pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
       type: "CONNECT",
       username: username,
-      timestamp: Date.now(),
+      timestamp: moment().valueOf(),
     })
 
     return res.status(201).json({
@@ -229,7 +230,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
       pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "DISCONNECT",
         username: user.data()!.username,
-        timestamp: Date.now(),
+        timestamp: moment().valueOf(),
       })
 
       return res.status(200).json({
