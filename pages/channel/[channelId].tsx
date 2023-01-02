@@ -18,6 +18,7 @@ const ChannelPage: NextPage = () => {
   const selectUsername = useAppSelector((state) => state.user.username)
   const selectChannelId = useAppSelector((state) => state.channel.id)
 
+  const [showUsers, setShowUsers] = useState(false)
   const [posts, setPosts] = useState<
     Array<TChannelMessage | TChannelInteraction>
   >([])
@@ -81,8 +82,16 @@ const ChannelPage: NextPage = () => {
   return (
     <div className="h-screen flex flex-col">
       <ChannelHeader />
-      <ChannelSubHeader pusherChannel={pusherChannel!} />
-      <ChannelMainSection connectedUser={connectedUser} posts={posts} />
+      <ChannelSubHeader
+        pusherChannel={pusherChannel!}
+        showUsers={showUsers}
+        setShowUsers={() => setShowUsers((prev) => !prev)}
+      />
+      <ChannelMainSection
+        connectedUser={connectedUser}
+        posts={posts}
+        showUsers={showUsers}
+      />
     </div>
   )
 }

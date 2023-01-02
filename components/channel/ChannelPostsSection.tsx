@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import type { TChannelInteraction, TChannelMessage } from "~~types/channel"
 
 import { useAppSelector } from "@store/hooks"
@@ -8,13 +9,19 @@ import ChannelPostMessage from "./ChannelPostMessage"
 
 type TChannelPostSectionProps = {
   posts: Array<TChannelMessage | TChannelInteraction>
+  showUsers: boolean
 }
 
-const ChannelPostSection = ({ posts }: TChannelPostSectionProps) => {
+const ChannelPostSection = ({ posts, showUsers }: TChannelPostSectionProps) => {
   const selectUsername = useAppSelector((state) => state.user.username)
 
   return (
-    <div className="w-9/12 flex flex-col px-8">
+    <div
+      id="channel-post-section"
+      className={`w-full lg:w-9/12 lg:!flex flex-col px-2 sm:px-4 md:px-8 ${
+        showUsers ? "hidden" : "flex"
+      }`}
+    >
       <div className="h-full flex flex-col py-2 space-y-1 overflow-y-auto">
         {posts.map((post, index) => {
           if (post.type === "MESSAGE") {

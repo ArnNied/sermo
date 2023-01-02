@@ -6,9 +6,15 @@ import { useAppSelector } from "@store/hooks"
 
 type TChannelSubHeader = {
   pusherChannel: Channel
+  showUsers: boolean
+  setShowUsers: () => void
 }
 
-const ChannelSubHeader = ({ pusherChannel }: TChannelSubHeader) => {
+const ChannelSubHeader = ({
+  pusherChannel,
+  showUsers,
+  setShowUsers,
+}: TChannelSubHeader) => {
   const router = useRouter()
   const selectChannelId = useAppSelector((state) => state.channel.id)
   const selectUserId = useAppSelector((state) => state.user.id)
@@ -35,15 +41,16 @@ const ChannelSubHeader = ({ pusherChannel }: TChannelSubHeader) => {
   }
 
   return (
-    <div className="w-screen flex flex-row justify-between px-24 py-1 bg-secondary-base">
-      <div className="flex flex-row items-center">
-        <Link href="https://github.com/ArnNied/sermo" className="text-white">
-          About
-        </Link>
-      </div>
-      <div className="flex items-center text-white">
-        <button onClick={onDisconnectButtonClick}>Disconnect</button>
-      </div>
+    <div className="w-screen flex flex-row justify-between items-center px-8 md:px-24 py-1 bg-secondary-base">
+      <button onClick={setShowUsers} className="block lg:hidden text-white">
+        {showUsers ? "Hide" : "Show"} Users
+      </button>
+      <Link href="https://github.com/ArnNied/sermo" className="text-white">
+        About
+      </Link>
+      <button onClick={onDisconnectButtonClick} className="text-white">
+        Disconnect
+      </button>
     </div>
   )
 }

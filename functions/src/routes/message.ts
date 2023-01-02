@@ -38,7 +38,7 @@ async function sendMessage(req: Request, res: Response) {
       return res.status(201).json({
         status: "CREATED",
         description: "Message successfully sent",
-        content: { ...message, timestamp: now },
+        content: { message: message, timestamp: now },
       })
     } else {
       return res.status(401).json({
