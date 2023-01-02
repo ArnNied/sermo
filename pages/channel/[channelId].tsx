@@ -26,6 +26,7 @@ const ChannelPage: NextPage = () => {
   ])
   const [pusherChannel, setPusherChannel] = useState<Channel>()
 
+  // Fetch connected users to populate the the UI and subscribe to the channel
   useEffect(() => {
     if (!selectUsername) {
       router.push("/")
@@ -44,17 +45,20 @@ const ChannelPage: NextPage = () => {
     const channel = PUSHER.subscribe(`channel.${selectChannelId}`)
     setPusherChannel(channel)
 
+    // Unsubscribe from the channel when the component unmounts
     return () => {
       setPusherChannel(undefined)
     }
   }, [])
 
+  // Bind to pusher events
   useEffect(() => {
     if (!pusherChannel) return
 
     pusherChannel.bind("message", (data: TChannelMessage) => {
       setPosts((prev) => [...prev, data])
     })
+
     pusherChannel.bind("connect/disconnect", (data: TChannelInteraction) => {
       setPosts((prev) => [...prev, data])
 
@@ -67,6 +71,7 @@ const ChannelPage: NextPage = () => {
       }
     })
 
+    // Unbind all events and unsubscribe from the channel when the component unmounts
     return () => {
       pusherChannel.unbind_all()
       pusherChannel.unsubscribe()

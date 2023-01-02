@@ -15,10 +15,13 @@ const ChannelMessageForm = () => {
 
     if (!canSend) return
 
+    // Prevent spamming
     setCanSend(false)
 
+    // Clear the text area
     setTextMessage("")
 
+    // Send the message to the server
     fetch("/api/message/", {
       method: "POST",
       headers: {
@@ -31,6 +34,7 @@ const ChannelMessageForm = () => {
       }),
     })
 
+    // Re-enable the send button after 150ms
     setTimeout(() => {
       setCanSend(true)
     }, 150)

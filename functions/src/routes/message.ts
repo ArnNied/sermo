@@ -24,6 +24,7 @@ async function sendMessage(req: Request, res: Response) {
   if (channel.exists) {
     const user = await admin.firestore().collection("users").doc(userId).get()
 
+    // Check if user is connected to channel
     if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
       pusher.trigger(`channel.${channelId}`, "message", {
         type: "MESSAGE",

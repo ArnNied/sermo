@@ -20,8 +20,10 @@ const IndexForm = () => {
   async function validateForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
+    // Plahesolder for error handling
     const tempErr: TIndexFormErrors = {}
 
+    // Validate username
     if (!username) {
       tempErr.username = "Username is required"
     } else if (username.includes(" ")) {
@@ -30,6 +32,7 @@ const IndexForm = () => {
       tempErr.username = "Username cannot be longer than 16 characters"
     }
 
+    // Validate channel ID
     if (!channelId) {
       tempErr.channelId = "Channel ID is required"
     } else if (!channelId.match(/^[a-z0-9\-]*$/i)) {
@@ -39,10 +42,11 @@ const IndexForm = () => {
       tempErr.channelId = "Channel ID must be less than 32 characters"
     }
 
+    // If no errors, send request to server
     if (Object.keys(tempErr).length === 0) {
-      // const req = (await res.json()).content
       let req, res
 
+      // Attempt to connect to the channel
       try {
         req = await fetch("/api/channel/connect", {
           method: "POST",
@@ -60,6 +64,7 @@ const IndexForm = () => {
       }
 
       if (req?.status === 200 || req?.status === 201) {
+        //If successful, update the redux store and redirect to the channel page
         dispatch(updateUserId(res.content.user.id))
         dispatch(updateUsername(username))
         dispatch(updateChannelId(channelId))

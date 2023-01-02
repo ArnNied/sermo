@@ -23,6 +23,8 @@ const ChannelSubHeader = ({ pusherChannel }: TChannelSubHeader) => {
       body: JSON.stringify({ channelId: selectChannelId }),
     })
 
+    // If the user is disconnected from the channel, unbind all events and
+    // unsubscribe from the channel
     if (res.status === 200) {
       pusherChannel!.unbind_all()
       pusherChannel!.unsubscribe()
