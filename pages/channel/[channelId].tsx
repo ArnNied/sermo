@@ -1,3 +1,4 @@
+import moment from "moment"
 import type { NextPage } from "next"
 import router from "next/router"
 import { Channel } from "pusher-js"
@@ -26,6 +27,8 @@ const ChannelPage: NextPage = () => {
     selectUsername,
   ])
   const [pusherChannel, setPusherChannel] = useState<Channel>()
+  const [lastActive, setLastActive] = useState<number>(moment.now())
+  const [afkAlerted, setAfkAlerted] = useState(false)
 
   // Fetch connected users to populate the the UI and subscribe to the channel
   useEffect(() => {
@@ -58,6 +61,10 @@ const ChannelPage: NextPage = () => {
 
     pusherChannel.bind("message", (data: TChannelMessage) => {
       setPosts((prev) => [...prev, data])
+
+      if (data.username !== selectUsername) {
+        setLastActive(data.timestamp)
+      }
     })
 
     pusherChannel.bind("connect/disconnect", (data: TChannelInteraction) => {
@@ -78,6 +85,21 @@ const ChannelPage: NextPage = () => {
       pusherChannel.unsubscribe()
     }
   }, [pusherChannel])
+
+  // redirect to home page if the user is afk after 1 hour
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!afkAlerted && moment.now() - lastActive > 1000 * 60 * 60) {
+        setAfkAlerted(true)
+        alert("You have been inactive for 1 hour. Redirecting to home page.")
+        router.replace("/")
+      }
+    }, 1000) // 1 seconds
+
+    return () => {
+      clearInterval(interval)
+    }
+  })
 
   return (
     <div className="h-screen flex flex-col">
