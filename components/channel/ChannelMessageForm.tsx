@@ -1,16 +1,19 @@
+import { useRouter } from "next/router"
 import { FormEvent, useState } from "react"
 import TextareaAutosize from "react-textarea-autosize"
 
 import { useAppSelector } from "@store/hooks"
 
 const ChannelMessageForm = () => {
+  const router = useRouter()
+
   const selectUserId = useAppSelector((state) => state.user.id)
   const selectChannelId = useAppSelector((state) => state.channel.id)
 
   const [textMessage, setTextMessage] = useState("")
   const [canSend, setCanSend] = useState(true)
 
-  function handleSubmit(e?: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e?: FormEvent<HTMLFormElement>) {
     e?.preventDefault()
 
     if (!canSend) return
@@ -24,18 +27,34 @@ const ChannelMessageForm = () => {
     // Clear the text area after sending the message
     setTextMessage("")
 
+    let req, res
     // Send the message to the server
-    fetch("/api/message/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + selectUserId,
-      },
-      body: JSON.stringify({
-        channelId: selectChannelId,
-        message: textMessage,
-      }),
-    })
+    try {
+      req = await fetch("/api/message/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + selectUserId,
+        },
+        body: JSON.stringify({
+          channelId: selectChannelId,
+          message: textMessage,
+        }),
+      })
+      res = await req.json()
+    } catch (err) {
+      alert("An error occurred while sending the message")
+      router.replace("/")
+    }
+    if (req?.status === 400) {
+      alert(res.message)
+    } else if (req?.status === 401) {
+      alert("Your session has expired. Please reconnect.")
+      router.replace("/")
+    } else if (req?.status === 404) {
+      alert(res.message)
+      router.replace("/")
+    }
 
     // Re-enable the send button after 150ms
     setTimeout(() => {
