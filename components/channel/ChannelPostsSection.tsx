@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import type { TChannelInteraction, TChannelMessage } from "~~types/channel"
 
 import { useAppSelector } from "@store/hooks"
@@ -14,15 +14,40 @@ type TChannelPostSectionProps = {
 
 const ChannelPostSection = ({ posts, showUsers }: TChannelPostSectionProps) => {
   const selectUsername = useAppSelector((state) => state.user.username)
+  const [atBottom, setAtBottom] = useState(true)
+
+  // Scroll to bottom whenever `posts` changes
+  useEffect(() => {
+    const channelPostSection = document.getElementById("channel-post-section")
+    if (!channelPostSection) return
+
+    // If the user is already at the bottom or the last post is from the user
+    // scroll to the bottom
+    // If the user is not at the bottom, do not scroll to the bottom
+    if (atBottom || posts[posts.length - 1].username === selectUsername) {
+      channelPostSection.scrollTo({
+        top: channelPostSection.scrollHeight,
+        behavior: "smooth",
+      })
+    }
+  }, [posts])
+
+  function handleScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
+    const target = e.target as HTMLDivElement
+    setAtBottom(target.scrollHeight - target.scrollTop === target.clientHeight)
+  }
 
   return (
     <div
-      id="channel-post-section"
       className={`w-full lg:w-9/12 lg:!flex flex-col px-2 sm:px-4 md:px-8 ${
         showUsers ? "hidden" : "flex"
       }`}
     >
-      <div className="h-full flex flex-col py-2 space-y-1 overflow-y-auto">
+      <div
+        id="channel-post-section"
+        onScroll={handleScroll}
+        className="h-full flex flex-col py-2 space-y-1 overflow-y-auto"
+      >
         {posts.map((post, index) => {
           if (post.type === "MESSAGE") {
             const message = post as TChannelMessage
