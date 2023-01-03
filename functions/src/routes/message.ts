@@ -3,7 +3,7 @@ import express from "express"
 import moment from "moment"
 
 import { admin } from "../core"
-import { pusher } from "../core"
+import { PUSHER } from "../core"
 import { userRequired } from "../middleware/common"
 import { preMessageSend } from "../middleware/message"
 import { getBearerToken } from "../utils"
@@ -28,7 +28,7 @@ async function sendMessage(req: Request, res: Response) {
 
     // Check if user is connected to channel
     if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
-      pusher.trigger(`channel.${channelId}`, "message", {
+      PUSHER.trigger(`channel.${channelId}`, "message", {
         type: "MESSAGE",
         username: user.data()!.username,
         message: message,

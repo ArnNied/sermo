@@ -71,7 +71,7 @@ const IndexForm = () => {
 
         router.push(`/channel/${channelId}`)
       } else {
-        tempErr.misc = req?.statusText
+        tempErr.misc = res?.description || req?.statusText || "Unknown error"
       }
     }
     setErrors(tempErr)

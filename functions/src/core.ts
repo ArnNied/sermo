@@ -14,7 +14,7 @@ app.use(deleteStaleUser)
 // The Firebase Admin SDK to access Firestore.
 admin.initializeApp()
 
-const pusher = new Pusher({
+const PUSHER = new Pusher({
   appId: process.env.PUSHER_APP_ID || "your_pusher_app_id",
   key: process.env.PUSHER_KEY || "your_pusher_key",
   secret: process.env.PUSHER_SECRET || "your_pusher_secret",
@@ -22,4 +22,4 @@ const pusher = new Pusher({
   useTLS: true,
 })
 
-export { admin, pusher, app }
+export { admin, PUSHER, app }

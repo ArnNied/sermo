@@ -15,10 +15,13 @@ const ChannelMessageForm = () => {
 
     if (!canSend) return
 
+    // Prevent sending empty messages
+    if (!textMessage) return
+
     // Prevent spamming
     setCanSend(false)
 
-    // Clear the text area
+    // Clear the text area after sending the message
     setTextMessage("")
 
     // Send the message to the server

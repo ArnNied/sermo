@@ -4,7 +4,7 @@ import express from "express"
 import moment from "moment"
 import { nanoid } from "nanoid"
 
-import { admin, pusher } from "../core"
+import { PUSHER, admin } from "../core"
 import { channelValidateBody, deleteEmptyChannels } from "../middleware/channel"
 import { userRequired } from "../middleware/common"
 import { getBearerToken } from "../utils"
@@ -88,12 +88,22 @@ async function connectToChannel(req: Request, res: Response) {
   if (!username) {
     return res.status(400).json({
       status: "ERROR",
-      description: '"username" field is required',
+      description: "Username field is required",
     })
   } else if (typeof username !== "string") {
     return res.status(400).json({
       status: "ERROR",
-      description: '"username" field must be string',
+      description: "Username field must be string",
+    })
+  } else if (username.includes(" ")) {
+    return res.status(400).json({
+      status: "ERROR",
+      description: "Username cannot contain spaces",
+    })
+  } else if (username.length > 16) {
+    return res.status(400).json({
+      status: "ERROR",
+      description: "Username field must be less than 16 characters",
     })
   }
 
@@ -145,7 +155,7 @@ async function connectToChannel(req: Request, res: Response) {
       })
 
     // Send a pusher event to notify the channel that a new user has connected
-    pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
+    PUSHER.trigger(`channel.${channelId}`, "connect/disconnect", {
       type: "CONNECT",
       username: username,
       timestamp: moment().valueOf(),
@@ -177,7 +187,7 @@ async function connectToChannel(req: Request, res: Response) {
       })
 
     // Send a pusher event to notify the channel that a new user has connected
-    pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
+    PUSHER.trigger(`channel.${channelId}`, "connect/disconnect", {
       type: "CONNECT",
       username: username,
       timestamp: moment().valueOf(),
@@ -227,7 +237,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
       await admin.firestore().collection("users").doc(userId).delete()
 
       // Send a pusher event to notify the channel that a user has disconnected
-      pusher.trigger(`channel.${channelId}`, "connect/disconnect", {
+      PUSHER.trigger(`channel.${channelId}`, "connect/disconnect", {
         type: "DISCONNECT",
         username: user.data()!.username,
         timestamp: moment().valueOf(),
