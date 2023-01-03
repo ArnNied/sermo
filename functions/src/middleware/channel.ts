@@ -42,16 +42,23 @@ export async function deleteEmptyChannels(
   res: Response,
   next: NextFunction
 ) {
-  const emptyChannel = await admin
-    .firestore()
-    .collection("channels")
-    .where("connectedUsers", "==", [])
-    .get()
+  const users = await admin.firestore().collection("users").get()
+  const populatedChannelIds = users.docs.map(
+    (userDoc) => userDoc.data().connectedTo
+  )
+
+  const channels = await admin.firestore().collection("channels").get()
+  const channelIds = channels.docs.map((channelDoc) => channelDoc.id)
+
+  const channelsToDelete = channelIds.filter(
+    (channelId) => !populatedChannelIds.includes(channelId)
+  )
 
   const batch = admin.firestore().batch()
 
-  emptyChannel.docs.forEach((doc) => {
-    batch.delete(doc.ref)
+  channelsToDelete.forEach((channelId) => {
+    const channelRef = admin.firestore().collection("channels").doc(channelId)
+    batch.delete(channelRef)
   })
 
   await batch.commit()

@@ -9,12 +9,10 @@ const router = express.Router()
 async function getAllUser(req: Request, res: Response) {
   const query = await admin.firestore().collection("users").get()
 
-  const listOfUsers = query.docs.map((doc) => {
+  const listOfUsers = query.docs.map((userDoc) => {
     return {
-      id: doc.id,
-      username: doc.data().username,
-      createdAt: doc.data().createdAt,
-      lastActive: doc.data().lastActive,
+      id: userDoc.id,
+      ...userDoc.data(),
     }
   })
 

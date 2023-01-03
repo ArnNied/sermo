@@ -11,10 +11,10 @@ export type TChannelInteraction = {
   timestamp: number
 }
 
+export type TChannelConnectedUsers = Array<string>
+
 export type TChannel = {
   id: string
   createdAt: number
-  connectedUsers: string[]
+  connectedUsers: TChannelConnectedUsers
 }
-
-export type TChannelConnectedUsers = Array<string>

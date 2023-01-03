@@ -15,13 +15,19 @@ const router = express.Router()
 async function getAllChannel(req: Request, res: Response) {
   const query = await admin.firestore().collection("channels").get()
 
-  const listOfChannels = query.docs.map((doc) => {
-    return {
-      id: doc.id,
-      createdAt: doc.data().createdAt,
-      connectedUsers: doc.data().connectedUsers,
-    }
-  })
+  const connectedUsers = await admin.firestore().collection("users").get()
+
+  const listOfChannels = query.docs.map((channelDoc) => ({
+    id: channelDoc.id,
+    ...channelDoc.data(),
+    connectedUsers: connectedUsers.docs
+      .map((userDoc) =>
+        userDoc.data().username && userDoc.data().connectedTo === channelDoc.id
+          ? userDoc.data().username
+          : null
+      )
+      .filter((username) => username !== null),
+  }))
 
   return res.status(200).json({
     status: "OK",
@@ -39,12 +45,23 @@ async function getChannel(req: Request, res: Response) {
     .doc(channelId)
     .get()
 
+  const connectedUsers = await admin
+    .firestore()
+    .collection("users")
+    .where("connectedTo", "==", channelId)
+    .get()
+
   // Check if channel exists
   if (channel.exists) {
     return res.status(200).json({
       status: "OK",
       description: "Channel retrieved",
-      content: channel.data(),
+      content: {
+        ...channel.data(),
+        connectedUsers: connectedUsers.docs.map(
+          (userDoc) => userDoc.data().username
+        ),
+      },
     })
   } else {
     return res.status(404).json({
@@ -64,11 +81,17 @@ async function getChannelUsers(req: Request, res: Response) {
     .doc(channelId)
     .get()
 
+  const connectedUsers = await admin
+    .firestore()
+    .collection("users")
+    .where("connectedTo", "==", channelId)
+    .get()
+
   if (channel.exists) {
     return res.status(200).json({
       status: "OK",
       description: "List of users in channel",
-      content: channel.data()!.connectedUsers,
+      content: connectedUsers.docs.map((userDoc) => userDoc.data().username),
     })
   } else {
     return res.status(404).json({
@@ -107,14 +130,15 @@ async function connectToChannel(req: Request, res: Response) {
     })
   }
 
-  const channel = await admin
+  const usernameTaken = await admin
     .firestore()
-    .collection("channels")
-    .doc(channelId)
+    .collection("users")
+    .where("connectedTo", "==", channelId)
+    .where("username", "==", username)
     .get()
 
   // Check if a username is already taken in the channel
-  if (channel.exists && channel.data()!.connectedUsers.includes(username)) {
+  if (!usernameTaken.empty) {
     return res.status(400).json({
       status: "ERROR",
       description: "Username already taken",
@@ -142,17 +166,21 @@ async function connectToChannel(req: Request, res: Response) {
     username: username,
     createdAt: now,
     lastActive: now,
+    connectedTo: channelId,
   })
 
+  const channel = await admin
+    .firestore()
+    .collection("channels")
+    .doc(channelId)
+    .get()
+
   if (channel.exists) {
-    // If channel exists, connect the user to the channel
-    await admin
+    const connectedUsers = await admin
       .firestore()
-      .collection("channels")
-      .doc(channelId)
-      .update({
-        connectedUsers: [...channel.data()!.connectedUsers, username],
-      })
+      .collection("users")
+      .where("connectedTo", "==", channelId)
+      .get()
 
     // Send a pusher event to notify the channel that a new user has connected
     PUSHER.trigger(`channel.${channelId}`, "connect/disconnect", {
@@ -165,7 +193,13 @@ async function connectToChannel(req: Request, res: Response) {
       status: "OK",
       description: "User successfully connected to channel",
       content: {
-        channel: { id: channelId, ...channel.data() },
+        channel: {
+          id: channelId,
+          ...channel.data(),
+          connectedUsers: connectedUsers.docs.map(
+            (userDoc) => userDoc.data().username
+          ),
+        },
         user: newUser,
       },
     })
@@ -177,20 +211,8 @@ async function connectToChannel(req: Request, res: Response) {
       createdAt: now,
       connectedUsers: [username],
     }
-    await admin
-      .firestore()
-      .collection("channels")
-      .doc(channelId)
-      .set({
-        createdAt: now,
-        connectedUsers: [username],
-      })
-
-    // Send a pusher event to notify the channel that a new user has connected
-    PUSHER.trigger(`channel.${channelId}`, "connect/disconnect", {
-      type: "CONNECT",
-      username: username,
-      timestamp: moment().valueOf(),
+    await admin.firestore().collection("channels").doc(channelId).set({
+      createdAt: now,
     })
 
     return res.status(201).json({
@@ -219,20 +241,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
 
   if (channel.exists) {
     // Check if user is connected to the channel in the first place
-    if (channel.data()!.connectedUsers.includes(user.data()!.username)) {
-      // Update the channel's connected users
-      await admin
-        .firestore()
-        .collection("channels")
-        .doc(channelId)
-        .update({
-          connectedUsers: channel
-            .data()!
-            .connectedUsers.filter(
-              (connectedUser: string) => connectedUser !== user.data()!.username
-            ),
-        })
-
+    if (user.data()!.connectedTo === channelId) {
       // Delete the user
       await admin.firestore().collection("users").doc(userId).delete()
 
@@ -250,8 +259,7 @@ async function disconnectFromChannel(req: Request, res: Response) {
     } else {
       return res.status(200).json({
         status: "OK",
-        description: "User already disconnected from channel or not connected",
-        content: channel.data(),
+        description: "User not connected",
       })
     }
   } else {
