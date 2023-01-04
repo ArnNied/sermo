@@ -29,6 +29,7 @@ const ChannelPostSection = ({ posts, showUsers }: TChannelPostSectionProps) => {
         top: channelPostSection.scrollHeight,
         behavior: "smooth",
       })
+      setAtBottom(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [posts])
