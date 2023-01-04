@@ -20,7 +20,7 @@ const ChannelSubHeader = ({
   const selectUserId = useAppSelector((state) => state.user.id)
 
   async function onDisconnectButtonClick() {
-    const res = await fetch("/api/channel/disconnect", {
+    await fetch("/api/channel/disconnect", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,15 +29,13 @@ const ChannelSubHeader = ({
       body: JSON.stringify({ channelId: selectChannelId }),
     })
 
-    // If the user is disconnected from the channel, unbind all events and
-    // unsubscribe from the channel
-    if (res.status === 200) {
-      pusherChannel!.unbind_all()
-      pusherChannel!.unsubscribe()
-      pusherChannel!.disconnect()
+    // Unbind all events and unsubscribe from the channel
+    // regardless of the response status code
+    pusherChannel!.unbind_all()
+    pusherChannel!.unsubscribe()
+    pusherChannel!.disconnect()
 
-      router.replace("/")
-    }
+    router.replace("/")
   }
 
   return (

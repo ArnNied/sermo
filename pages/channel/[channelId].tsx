@@ -33,7 +33,7 @@ const ChannelPage: NextPage = () => {
   // Fetch connected users to populate the the UI and subscribe to the channel
   useEffect(() => {
     if (!selectUsername) {
-      router.push("/")
+      router.replace("/")
       return
     }
 
