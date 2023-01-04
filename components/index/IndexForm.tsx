@@ -90,14 +90,14 @@ const IndexForm = () => {
   }
 
   return (
-    <div className="w-full md:w-5/12 h-full md:h-screen flex flex-col justify-center p-2 md:p-4 lg:p-8 xl:p-16 bg-primary-base space-y-4">
+    <div className="w-full md:w-5/12 h-full md:h-screen flex flex-col justify-center items-center p-8 xl:p-16 bg-primary-base space-y-4">
       <div className="flex flex-col">
         <h1 className="font-bold text-6xl text-white text-center">SERMO</h1>
         <h2 className="font-semibold text-white text-center">
           Lightweight and No BS Messaging
         </h2>
       </div>
-      <div className="flex mx-8 p-4 bg-white rounded-lg">
+      <div className="w-full max-w-sm md:max-w-md flex p-4 bg-white rounded-lg">
         <form
           method="POST"
           onSubmit={(e) => validateForm(e)}

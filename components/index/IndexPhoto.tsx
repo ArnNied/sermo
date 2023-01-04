@@ -9,7 +9,7 @@ const IndexPhoto = () => {
   }, [])
 
   return (
-    <div className="relative w-full md:w-7/12 h-[45%] md:h-screen">
+    <div className="hidden md:block relative w-full md:w-7/12 h-[45%] md:h-screen">
       <div
         id="index-photo"
         className="w-full h-full"

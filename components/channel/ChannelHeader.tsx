@@ -13,7 +13,7 @@ const ChannelHeader = () => {
           Straightforward and No BS Messaging
         </h2>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center overflow-hidden">
         <h3 className="text-white md:text-lg">
           Connected to: <span className="font-bold">{selectChannelId}</span>
         </h3>
