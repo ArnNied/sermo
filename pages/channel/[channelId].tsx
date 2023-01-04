@@ -1,6 +1,6 @@
 import moment from "moment"
 import type { NextPage } from "next"
-import router from "next/router"
+import router, { useRouter } from "next/router"
 import { Channel } from "pusher-js"
 import { useEffect, useState } from "react"
 import {
@@ -16,8 +16,11 @@ import { PUSHER } from "@core/pusher"
 import { useAppSelector } from "@store/hooks"
 
 const ChannelPage: NextPage = () => {
+  const router = useRouter()
+
+  const { channelId } = router.query
+
   const selectUsername = useAppSelector((state) => state.user.username)
-  const selectChannelId = useAppSelector((state) => state.channel.id)
 
   const [showUsers, setShowUsers] = useState(false)
   const [posts, setPosts] = useState<
@@ -32,12 +35,14 @@ const ChannelPage: NextPage = () => {
 
   // Fetch connected users to populate the the UI and subscribe to the channel
   useEffect(() => {
-    if (!selectUsername) {
-      router.replace("/")
+    if (!router.isReady) return
+
+    if (!selectUsername && channelId) {
+      router.replace(`/?channel=${channelId}`)
       return
     }
 
-    fetch(`/api/channel/${selectChannelId}/users`)
+    fetch(`/api/channel/${channelId}/users`)
       .then((res) => res.json())
       .then((data) => {
         data = data.content.filter(
@@ -46,7 +51,7 @@ const ChannelPage: NextPage = () => {
         setConnectedUser([selectUsername, ...data])
       })
 
-    const channel = PUSHER.subscribe(`channel.${selectChannelId}`)
+    const channel = PUSHER.subscribe(`channel.${channelId}`)
     setPusherChannel(channel)
 
     // Unsubscribe from the channel when the component unmounts
@@ -54,7 +59,7 @@ const ChannelPage: NextPage = () => {
       setPusherChannel(undefined)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [router.isReady])
 
   // Bind to pusher events
   useEffect(() => {

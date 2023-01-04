@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import { FormEvent } from "react"
+import { FormEvent, useEffect } from "react"
 import { useState } from "react"
 import { TIndexFormErrors } from "~~types/index"
 
@@ -13,9 +13,21 @@ const IndexForm = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
 
+  const { channel } = router.query
+
   const [username, setUsername] = useState("")
   const [channelId, setChannelId] = useState("")
   const [errors, setErrors] = useState<TIndexFormErrors>()
+
+  // Update the channel ID if it is passed in the URL from a redirect
+  // as a sort of "invitation" feature
+  useEffect(() => {
+    console.log(channel)
+    if (!router.isReady) return
+    console.log(channel)
+
+    if (channel) setChannelId(channel as string)
+  }, [channel, router.isReady])
 
   async function validateForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -101,6 +113,7 @@ const IndexForm = () => {
             id="channelIdInput"
             error={errors?.channelId}
             display="Channel ID"
+            value={channelId}
             onChangeHandler={setChannelId}
           />
           <div className="flex flex-col space-y-1">

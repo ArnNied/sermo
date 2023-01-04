@@ -2,6 +2,7 @@ type TIndexInputProps = {
   id: string
   error?: string
   display: string
+  value?: string
   onChangeHandler: (e: string) => void
 }
 
@@ -9,6 +10,7 @@ const IndexInput = ({
   id,
   error,
   display,
+  value,
   onChangeHandler,
 }: TIndexInputProps) => {
   return (
@@ -20,6 +22,7 @@ const IndexInput = ({
         id={id}
         type="text"
         placeholder={display}
+        value={value}
         onChange={(e) => onChangeHandler(e.target.value)}
         className="px-1 py-px border-b-2 border-solid border-primary-base border-opacity-50 focus:border-opacity-100 outline-none"
       />
