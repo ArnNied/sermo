@@ -21,8 +21,8 @@ const ChannelPostSection = ({ posts, showUsers }: TChannelPostSectionProps) => {
     const channelPostSection = document.getElementById("channel-post-section")
     if (!channelPostSection) return
 
-    // If the user is already at the bottom or the last post is from the user
-    // scroll to the bottom
+    // If the user is already at the bottom or the new post is from the user
+    // scroll to the bottom on new post
     // If the user is not at the bottom, do not scroll to the bottom
     if (atBottom || posts[posts.length - 1].username === selectUsername) {
       channelPostSection.scrollTo({
@@ -30,6 +30,7 @@ const ChannelPostSection = ({ posts, showUsers }: TChannelPostSectionProps) => {
         behavior: "smooth",
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [posts])
 
   function handleScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {

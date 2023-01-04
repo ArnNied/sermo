@@ -1,6 +1,5 @@
 import parse from "html-react-parser"
 import * as Jidenticon from "jdenticon"
-import { useEffect } from "react"
 import type { TChannelConnectedUsers } from "~~types/channel"
 
 import { useAppSelector } from "@store/hooks"

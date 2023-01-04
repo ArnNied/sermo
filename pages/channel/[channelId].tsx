@@ -53,6 +53,7 @@ const ChannelPage: NextPage = () => {
     return () => {
       setPusherChannel(undefined)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Bind to pusher events
@@ -84,6 +85,7 @@ const ChannelPage: NextPage = () => {
       pusherChannel.unbind_all()
       pusherChannel.unsubscribe()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pusherChannel])
 
   // redirect to home page if the user is afk after 1 hour

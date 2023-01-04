@@ -46,6 +46,7 @@ const ChannelMessageForm = () => {
       alert("An error occurred while sending the message")
       router.replace("/")
     }
+
     if (req?.status === 400) {
       alert(res.message)
     } else if (req?.status === 401) {

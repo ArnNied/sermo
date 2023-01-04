@@ -1,14 +1,15 @@
 export function generateId(
-  length: number,
-  characters: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    length: number,
+    // eslint-disable-next-line max-len
+    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 ): string {
-  let result = ""
+  let result = "";
   for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length))
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  return result
+  return result;
 }
 
 export function getBearerToken(authorization?: string) {
-  return authorization?.split(" ")[1] || ""
+  return authorization?.split(" ")[1] || "";
 }

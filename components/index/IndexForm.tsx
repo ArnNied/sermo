@@ -20,7 +20,7 @@ const IndexForm = () => {
   async function validateForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    // Plahesolder for error handling
+    // Plahesolder for error handling to display on the form
     const tempErr: TIndexFormErrors = {}
 
     // Validate username
@@ -69,7 +69,7 @@ const IndexForm = () => {
         dispatch(updateUsername(username))
         dispatch(updateChannelId(channelId))
 
-        router.push(`/channel/${channelId}`)
+        router.replace(`/channel/${channelId}`)
       } else {
         tempErr.misc = res?.description || req?.statusText || "Unknown error"
       }
