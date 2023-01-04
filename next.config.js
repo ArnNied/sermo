@@ -8,7 +8,7 @@ const nextConfig = {
         source: "/api/:path*",
         destination:
           process.env.NODE_ENV === "production"
-            ? process.env.API_URL
+            ? `${process.env.API_URL}/:path*`
             : "http://127.0.0.1:5001/sermo-api/asia-southeast2/default/:path*", // Proxy to Backend
       },
     ]
