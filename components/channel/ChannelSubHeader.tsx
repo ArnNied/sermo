@@ -46,12 +46,14 @@ const ChannelSubHeader = ({
       >
         {showUsers ? "Hide" : "Show"} Users
       </button>
-      <Link
+      <a
+        target="_blank"
         href="https://github.com/ArnNied/sermo"
+        rel="noopener noreferrer"
         className="text-white hover:text-gray-200 active:text-gray-400"
       >
         About
-      </Link>
+      </a>
       <button
         onClick={onDisconnectButtonClick}
         className="text-white hover:text-gray-200 active:text-gray-400"
