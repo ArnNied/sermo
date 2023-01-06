@@ -22,9 +22,7 @@ const IndexForm = () => {
   // Update the channel ID if it is passed in the URL from a redirect
   // as a sort of "invitation" feature
   useEffect(() => {
-    console.log(channel)
     if (!router.isReady) return
-    console.log(channel)
 
     if (channel) setChannelId(channel as string)
   }, [channel, router.isReady])

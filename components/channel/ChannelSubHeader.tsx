@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { Channel } from "pusher-js"
+import { useEffect } from "react"
 
 import { useAppSelector } from "@store/hooks"
 
@@ -18,6 +19,11 @@ const ChannelSubHeader = ({
   const router = useRouter()
   const selectChannelId = useAppSelector((state) => state.channel.id)
   const selectUserId = useAppSelector((state) => state.user.id)
+
+  useEffect(() => {
+    window.onbeforeunload = onDisconnectButtonClick
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function onDisconnectButtonClick() {
     await fetch("/api/channel/disconnect", {
