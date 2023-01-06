@@ -41,7 +41,7 @@ const ChannelPostSection = ({ posts, showUsers }: TChannelPostSectionProps) => {
 
   return (
     <div
-      className={`w-full lg:w-9/12 lg:!flex flex-col px-2 sm:px-4 md:px-8 ${
+      className={`w-full lg:w-9/12 lg:!flex flex-col pb-8 lg:pb-0 px-2 sm:px-4 md:px-8 ${
         showUsers ? "hidden" : "flex"
       }`}
     >
