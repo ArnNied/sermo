@@ -1,34 +1,47 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sermo
+
+A chat application built with NextJS, Firebase, and Pusher. Click [here](https://sermo-arnnied.vercel.app) to view the live demo.
 
 ## Getting Started
 
-First, run the development server:
+1. Create a `.env` file in the root of the project and add the following:
 
 ```bash
-npm run dev
-# or
-yarn dev
+API_URL=                            # The URL of your configured firebase functions
+NEXT_PUBLIC_PUSHER_KEY=             # Your Pusher key
+NEXT_PUBLIC_PUSHER_CLUSTER=         # Your Pusher cluster
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Create another `.env` file in the `functions` directory and add the following:
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```bash
+PUSHER_APP_ID=                      # Your Pusher app ID
+PUSHER_KEY=                         # Your Pusher key
+PUSHER_SECRET=                      # Your Pusher secret
+PUSHER_CLUSTER=                     # Your Pusher cluster
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+3. Install the dependencies:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+yarn
+# or
+npm install
+```
 
-## Learn More
+4. Run the Firebase functions:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cd functions
+yarn serve
+# or
+npm run serve
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Run the development server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```bash
+yarn dev
+# or
+npm run dev
+```
